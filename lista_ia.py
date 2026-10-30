@@ -44,6 +44,14 @@ def count(xs, x):
     )
 
 
+def tail_k(xs, k):
+    return xs if xs == [] or k == 0 else tail_k(tail(xs), k - 1)
+
+
+def range(n):
+    return [] if n == -1 else range(n - 1) + [n]
+
+
 # ============================================================================ #
 
 # Questão 1
@@ -52,9 +60,6 @@ def count(xs, x):
 def compactar(xs):
     def count_seq(xs, x):
         return 0 if xs == [] or head(xs) != x else 1 + count_seq(tail(xs), x)
-
-    def tail_k(xs, k):
-        return xs if xs == [] or k == 0 else tail_k(tail(xs), k - 1)
 
     return (
         []
@@ -135,4 +140,111 @@ def histograma(xs):
 
 
 def intersecao_multi(a, b):
-    pass
+    def remove_first(xs, x):
+        return (
+            []
+            if xs == []
+            else [head(xs)] + remove_first(tail(xs), x)
+            if head(xs) != x
+            else tail(xs)
+        )
+
+    return (
+        []
+        if a == [] or b == []
+        else [head(a)] + intersecao_multi(tail(a), remove_first(b, head(a)))
+        if find(b, head(a))
+        else intersecao_multi(tail(a), b)
+    )
+
+
+# Questao 7
+
+
+def segmentar_crescentes(xs):
+    def aux(xs, prev, count):
+        return (
+            [count]
+            if xs == [] or (prev != None and head(xs) <= prev)
+            else [head(xs)] + aux(tail(xs), head(xs), count + 1)
+        )
+
+    if xs == []:
+        return []
+
+    t = aux(xs, None, 0)
+    count = last(t)
+    t = init(t)
+
+    return [t] + segmentar_crescentes(tail_k(xs, count))
+
+
+# Questao 8
+
+
+def compor(fs, x):
+    return x if fs == [] else compor(tail(fs), head(fs)(x))
+
+
+# Questao 9
+
+
+def entrelacar(ls):
+    ls = filter(ls, lambda l: l != [])
+    return [] if ls == [] else cat(map(ls, head), entrelacar(map(ls, tail)))
+
+
+# Questao 10
+
+
+def starts_with(sub, xs):
+    return sub == [] or (
+        xs != [] and head(sub) == head(xs) and starts_with(tail(sub), tail(xs))
+    )
+
+
+def ocorrencias(p, xs):
+    if p == []:
+        return range(len(xs))
+
+    def aux(p, xs, idx):
+        return (
+            []
+            if xs == []
+            else ([idx] if starts_with(p, xs) else []) + aux(p, tail(xs), idx + 1)
+        )
+
+    return aux(p, xs, 0)
+
+
+# Questao 11
+
+
+def first_k(xs, k):
+    return [] if xs == [] or k == 0 else [head(xs)] + first_k(tail(xs), k - 1)
+
+
+def last_k(xs, k):
+    return [] if xs == [] or k == 0 else [last(xs)] + last_k(init(xs), k - 1)
+
+
+def merge_sort(regs):
+    def merge(xs, ys):
+        return (
+            xs
+            if ys == []
+            else ys
+            if xs == []
+            else (
+                [head(xs)] + merge(tail(xs), ys)
+                if head(head(xs)) <= head(head(ys))
+                else [head(ys)] + merge(xs, tail(ys))
+            )
+        )
+
+    if tail(regs) == []:
+        return regs
+    mid = len(regs) // 2
+    first_part = first_k(regs, mid)
+    second_part = last_k(regs, len(regs) - mid)
+    return merge(merge_sort(first_part), merge_sort(second_part))
