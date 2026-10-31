@@ -34,6 +34,14 @@ def map(xs, f):
     return xs if xs == [] else [f(head(xs))] + map(tail(xs), f)
 
 
+def reduce(xs, f, acc):
+    return acc if xs == [] else f(head(xs), acc) + reduce(tail(xs), f, acc)
+
+
+def sum(x, acc):
+    return x + acc
+
+
 def count(xs, x):
     return (
         0
@@ -46,6 +54,10 @@ def count(xs, x):
 
 def tail_k(xs, k):
     return xs if xs == [] or k == 0 else tail_k(tail(xs), k - 1)
+
+
+def head_k(xs, k):
+    return None if xs == [] else head(xs) if k == 0 else head_k(tail(xs), k - 1)
 
 
 def range(n):
@@ -248,3 +260,96 @@ def merge_sort(regs):
     first_part = first_k(regs, mid)
     second_part = last_k(regs, len(regs) - mid)
     return merge(merge_sort(first_part), merge_sort(second_part))
+
+
+# Questao 12
+
+
+def selecionar(xs, k):
+    if k < 0 or k >= len(xs):
+        return None
+
+    def aux(xs, k):
+        mid = len(xs) // 2
+        pivot = head_k(xs, mid)
+        lt = filter(xs, lambda x: x < pivot)
+        eq = filter(xs, lambda x: x == pivot)
+        gt = filter(xs, lambda x: x > pivot)
+        t = len(lt)
+        return (
+            head(xs)
+            if len(xs) == 1 or (lt == [] and gt == [])
+            else aux(lt, k)
+            if t > k
+            else aux(gt, k - t - 1)
+            if t < k
+            else aux(eq, k - t)
+        )
+
+    return aux(xs, k)
+
+
+# Questao 13
+
+
+def pairs(a, b):
+    return (
+        []
+        if a == [] or b == []
+        else cat(map(a, lambda x: [x, head(b)]), pairs(a, tail(b)))
+    )
+
+
+def convoluir(a, b):
+    if a == [] or b == []:
+        return []
+    m = len(a)
+    n = len(b)
+    c = m + n - 1
+
+    def aux(a, b, k):
+        if k == -1:
+            return []
+        iis = init(range(m))
+        js = init(range(n))
+        p = pairs(iis, js)
+        p = filter(p, lambda x: head(x) + last(x) == k)
+        p = map(p, lambda x: head_k(a, head(x)) * head_k(b, last(x)))
+        p = reduce(p, sum, 0)
+        return aux(a, b, k - 1) + [p]
+
+    return aux(a, b, c - 1)
+
+
+# Questao 14
+
+
+def reverse(xs):
+    return [] if xs == [] else [last(xs)] + reverse(init(xs))
+
+
+def transpose(m):
+    return (
+        [] if m == [] or head(m) == [] else cat([map(m, head)], transpose(map(m, tail)))
+    )
+
+
+def girar_matriz(m):
+    return transpose(reverse(m))
+
+
+# Questao 15
+
+
+def zip(a, b):
+    return [] if a == [] or b == [] else [[head(a), head(b)]] + zip(tail(a), tail(b))
+
+
+def multiplicar_matrizes(A, B):
+    B = transpose(B)
+    return map(
+        A,
+        lambda a: map(
+            B, lambda b: reduce(map(zip(a, b), lambda x: head(x) * last(x)), sum, 0)
+        ),
+    )
