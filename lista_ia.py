@@ -73,13 +73,11 @@ def compactar(xs):
     def count_seq(xs, x):
         return 0 if xs == [] or head(xs) != x else 1 + count_seq(tail(xs), x)
 
-    return (
-        []
-        if xs == []
-        else [[head(xs), count_seq(xs, head(xs))]]
-        + compactar(tail_k(xs, count_seq(xs, head(xs))))
-    )
+    if xs == []:
+        return []
 
+    c = count_seq(xs, head(xs))
+    return prepend(pair(head(xs), c), compactar(tail_k(xs, c)))
 
 def expandir(ts):
     def generate(x, k):
