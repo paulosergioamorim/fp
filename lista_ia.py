@@ -61,7 +61,7 @@ def head_k(xs, k):
 
 
 def range(n):
-    return [] if n == -1 else range(n - 1) + [n]
+    return [0] if n == 0 else range(n - 1) + [n]
 
 
 # ============================================================================ #
@@ -83,7 +83,7 @@ def compactar(xs):
 
 def expandir(ts):
     def generate(x, k):
-        return [] if k == 0 else [x] + generate(x, k - 1)
+        return map(range(k - 1), lambda _: x)
 
     return (
         []
@@ -232,12 +232,12 @@ def ocorrencias(p, xs):
 # Questao 11
 
 
-def first_k(xs, k):
-    return [] if xs == [] or k == 0 else [head(xs)] + first_k(tail(xs), k - 1)
+def first_k_elements(xs, k):
+    return [] if xs == [] or k == 0 else [head(xs)] + first_k_elements(tail(xs), k - 1)
 
 
-def last_k(xs, k):
-    return [] if xs == [] or k == 0 else [last(xs)] + last_k(init(xs), k - 1)
+def last_k_elements(xs, k):
+    return [] if xs == [] or k == 0 else [last(xs)] + last_k_elements(init(xs), k - 1)
 
 
 def merge_sort(regs):
@@ -257,8 +257,8 @@ def merge_sort(regs):
     if tail(regs) == []:
         return regs
     mid = len(regs) // 2
-    first_part = first_k(regs, mid)
-    second_part = last_k(regs, len(regs) - mid)
+    first_part = first_k_elements(regs, mid)
+    second_part = last_k_elements(regs, len(regs) - mid)
     return merge(merge_sort(first_part), merge_sort(second_part))
 
 
@@ -292,11 +292,11 @@ def selecionar(xs, k):
 # Questao 13
 
 
-def pairs(a, b):
+def cartesian_product(a, b):
     return (
         []
         if a == [] or b == []
-        else cat(map(a, lambda x: [x, head(b)]), pairs(a, tail(b)))
+        else cat(map(a, lambda x: [x, head(b)]), cartesian_product(a, tail(b)))
     )
 
 
@@ -310,10 +310,10 @@ def convoluir(a, b):
     def aux(a, b, k):
         if k == -1:
             return []
-        iis = init(range(m))
-        js = init(range(n))
-        p = pairs(iis, js)
-        p = filter(p, lambda x: head(x) + last(x) == k)
+        i = range(m - 1)
+        j = range(n - 1)
+        p = cartesian_product(i, j)
+        p = filter(p, lambda x: reduce(x, sum, 0) == k)
         p = map(p, lambda x: head_k(a, head(x)) * head_k(b, last(x)))
         p = reduce(p, sum, 0)
         return aux(a, b, k - 1) + [p]
@@ -341,8 +341,12 @@ def girar_matriz(m):
 # Questao 15
 
 
+def pair(a, b):
+    return [a, b]
+
+
 def zip(a, b):
-    return [] if a == [] or b == [] else [[head(a), head(b)]] + zip(tail(a), tail(b))
+    return [] if a == [] or b == [] else prepend(pair(a, b), zip(tail(a), tail(b)))
 
 
 def multiplicar_matrizes(A, B):
@@ -353,3 +357,76 @@ def multiplicar_matrizes(A, B):
             B, lambda b: reduce(map(zip(a, b), lambda x: head(x) * last(x)), sum, 0)
         ),
     )
+
+
+# Questao 16
+
+
+def girar_90deg_anti(m):
+    if m == [] or head(m) == []:
+        return []
+    r = map(m, last)
+    return cat([r], girar_90deg_anti(map(m, init)))
+
+
+def espiral(m):
+    if m == []:
+        return []
+    r = head(m)
+    rest = tail(m)
+    rest = girar_90deg_anti(rest)
+    return cat(r, espiral(rest))
+
+
+# Questao 17
+
+
+def append(xs, x):
+    return xs + [x]
+
+
+def prepend(x, xs):
+    return [x] + xs
+
+
+def balanceados(text):
+    def remove_last_if_equal(xs, x):
+        return [] if xs == [] else init(xs) if last(xs) == x else xs
+
+    def aux(chrs, xs):
+        if chrs == []:
+            return xs == []
+        c = head(chrs)
+        chrs = tail(chrs)
+        if c == "(":
+            return aux(chrs, append(xs, ")"))
+        if c == "[":
+            return aux(chrs, append(xs, "]"))
+        if c == "{":
+            return aux(chrs, append(xs, "}"))
+        if c == ")" or c == "]" or c == "}":
+            return (
+                False
+                if xs == []
+                else aux(chrs, init(xs))
+                if last(xs) == c
+                else aux(chrs, xs)
+            )
+        return aux(chrs, xs)
+
+    return aux(list(text), [])
+
+
+# Quick Sort
+
+
+def quick_sort(xs):
+    if xs == []:
+        return []
+    pivot = selecionar(xs, len(xs) // 2)
+    lt = filter(xs, lambda x: x < pivot)
+    eq = filter(xs, lambda x: x == pivot)
+    gt = filter(xs, lambda x: x > pivot)
+    lt = quick_sort(lt)
+    gt = quick_sort(gt)
+    return cat(lt, cat(eq, gt))
