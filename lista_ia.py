@@ -547,7 +547,7 @@ def distancia(a, b):
         if len(a) == len(b):
             return 1 + aux(tail(a), tail(b))
         return min(
-            [1 + aux(tail(a), b), 1 + aux(tail(a), tail(b)), 1 + aux(a, tail(b))]
+            [1 + aux(tail(a), b), 1 + aux(tail(a), tail(b)), 1 + aux(a, init(b))]
         )
 
     return aux(list(a), list(b))
