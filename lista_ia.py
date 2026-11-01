@@ -26,6 +26,13 @@ def find(xs, x):
     return False if xs == [] else True if head(xs) == x else find(tail(xs), x)
 
 
+def index_of(xs, x):
+    def aux(xs, x, idx):
+        return None if xs == [] else idx if head(xs) == x else aux(tail(xs), x, idx + 1)
+
+    return aux(xs, x, 0)
+
+
 def filter(xs, f):
     return xs if xs == [] else ([head(xs)] if f(head(xs)) else []) + filter(tail(xs), f)
 
@@ -78,6 +85,7 @@ def compactar(xs):
 
     c = count_seq(xs, head(xs))
     return prepend(pair(head(xs), c), compactar(tail_k(xs, c)))
+
 
 def expandir(ts):
     def generate(x, k):
@@ -428,3 +436,118 @@ def quick_sort(xs):
     lt = quick_sort(lt)
     gt = quick_sort(gt)
     return cat(lt, cat(eq, gt))
+
+
+# Questao 18
+
+
+def avaliar_posfixa(tokens):
+    def is_operator(t):
+        return t == "+" or t == "-" or t == "*" or t == "//"
+
+    def evaluate(x, y, t):
+        if x == None or y == None:
+            return None
+        if t == "+":
+            return x + y
+        if t == "-":
+            return x - y
+        if t == "*":
+            return x * y
+        if t == "//":
+            return None if y == 0 else x // y
+
+    if filter(tokens, is_operator) == []:
+        return head(tokens) if len(tokens) == 1 else None
+
+    def aux(tokens, xs):
+        if tokens == []:
+            return None if len(xs) != 1 else last(xs)
+        t = head(tokens)
+        if is_operator(t):
+            if len(xs) < 2:
+                return None
+            left = last(init(xs))
+            right = last(xs)
+            x = evaluate(left, right, t)
+            xs = init(init(xs))
+            xs = append(xs, x)
+            return aux(tail(tokens), xs)
+        xs = append(xs, t)
+        return aux(tail(tokens), xs)
+
+    return aux(tokens, [])
+
+
+# Questao 19
+
+
+def corresponde(pattern, text):
+    def aux(pattern, text):
+        if pattern == []:
+            return text == []
+        p = head(pattern)
+        if p != "*" and text == []:
+            return False
+        if p == "*":
+            if tail(pattern) == []:
+                return True
+            pp = head(tail(pattern))
+            if pp == "?" or pp == "*":
+                return corresponde(tail(pattern), text)
+            k = index_of(text, pp)
+            return False if k == None else corresponde(tail(pattern), tail_k(text, k))
+        t = head(text)
+        return (
+            False
+            if (p == "?" and text == []) or (p != "?" and t != p)
+            else corresponde(tail(pattern), tail(text))
+        )
+
+    return aux(list(pattern), list(text))
+
+
+# 20 Distância de edição
+
+
+def min(xs):
+    def aux(xs, x):
+        return (
+            x
+            if xs == []
+            else aux(tail(xs), head(xs))
+            if (x == None or head(xs) < x)
+            else aux(tail(xs), x)
+        )
+
+    return aux(xs, None)
+
+
+def max(xs):
+    def aux(xs, x):
+        return (
+            x
+            if xs == []
+            else aux(tail(xs), head(xs))
+            if (x == None or head(xs) > x)
+            else aux(tail(xs), x)
+        )
+
+    return aux(xs, None)
+
+
+def distancia(a, b):
+    def aux(a, b):
+        if a == []:
+            return len(b)
+        if b == []:
+            return len(a)
+        if head(a) == head(b):
+            return aux(tail(a), tail(b))
+        if len(a) == len(b):
+            return 1 + aux(tail(a), tail(b))
+        return min(
+            [1 + aux(tail(a), b), 1 + aux(tail(a), tail(b)), 1 + aux(a, tail(b))]
+        )
+
+    return aux(list(a), list(b))
