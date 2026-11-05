@@ -42,7 +42,7 @@ def map(xs, f):
 
 
 def reduce(xs, f, acc):
-    return acc if xs == [] else f(head(xs), acc) + reduce(tail(xs), f, acc)
+    return acc if xs == [] else f(head(xs), reduce(tail(xs), f, acc))
 
 
 def sum(x, acc):
@@ -352,7 +352,11 @@ def pair(a, b):
 
 
 def zip(a, b):
-    return [] if a == [] or b == [] else prepend(pair(a, b), zip(tail(a), tail(b)))
+    return (
+        []
+        if a == [] or b == []
+        else prepend(pair(head(a), head(b)), zip(tail(a), tail(b)))
+    )
 
 
 def multiplicar_matrizes(A, B):
@@ -551,3 +555,50 @@ def distancia(a, b):
         )
 
     return aux(list(a), list(b))
+
+
+# 21 Maior subsequência comum com desempate
+
+
+def scm(a, b):
+    def aux(a, b):
+        return (
+            []
+            if a == [] or b == []
+            else aux(a, tail(b))
+            if head(a) != head(b)
+            else prepend(head(a), aux(tail(a), tail(b)))
+        )
+
+    if a == "":
+        return a
+    if b == "":
+        return b
+    x = aux(list(a), list(b))
+    y = scm(tail(a), b)
+    return x if len(x) > len(y) else y if len(x) < len(y) else x if x < y else y
+
+
+# 22 Todos os subconjuntos com soma-alvo
+
+
+def set(xs):
+    return reduce(xs, lambda x, acc: acc if find(acc, x) else prepend(x, acc), [])
+
+
+def powerset(xs):
+    ys = map(xs, lambda x: filter(xs, lambda y: x != y))
+    return set([[]] if ys == [] else [xs] + reduce(map(ys, powerset), cat, []))
+
+
+def subconjuntos_soma(xs, target):
+    ps = powerset(xs)
+    ps = filter(ps, lambda p: reduce(p, sum, 0) == target)
+    return ps
+
+
+# 23 Permutações únicas em ordem lexicográfica
+
+
+def permutacoes(xs):
+    pass
