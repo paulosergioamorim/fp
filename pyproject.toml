@@ -1,0 +1,8 @@
+[project]
+name = "functional-programming"
+version = "0.1.0"
+authors = [
+    { name = "Paulo Sérgio", email = "pamorimmonico@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
