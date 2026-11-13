@@ -66,11 +66,6 @@ def tail_k(xs, k):
 def head_k(xs, k):
     return None if xs == [] else head(xs) if k == 0 else head_k(tail(xs), k - 1)
 
-
-def range(n):
-    return [0] if n == 0 else range(n - 1) + [n]
-
-
 # ============================================================================ #
 
 # Questão 1
@@ -89,7 +84,8 @@ def compactar(xs):
 
 def expandir(ts):
     def generate(x, k):
-        return map(range(k - 1), lambda _: x)
+        xs = [x for x in range(0, k)]
+        return map(xs, lambda _: x)
 
     return (
         []
@@ -223,7 +219,8 @@ def starts_with(sub, xs):
 
 def ocorrencias(p, xs):
     if p == []:
-        return range(len(xs))
+        xs = [x for x in range(len(xs)+1)]
+        return xs
 
     def aux(p, xs, idx):
         return (
@@ -272,27 +269,19 @@ def merge_sort(regs):
 
 
 def selecionar(xs, k):
-    if k < 0 or k >= len(xs):
-        return None
-
-    def aux(xs, k):
-        mid = len(xs) // 2
-        pivot = head_k(xs, mid)
-        lt = filter(xs, lambda x: x < pivot)
-        eq = filter(xs, lambda x: x == pivot)
-        gt = filter(xs, lambda x: x > pivot)
-        t = len(lt)
-        return (
-            head(xs)
-            if len(xs) == 1 or (lt == [] and gt == [])
-            else aux(lt, k)
-            if t > k
-            else aux(gt, k - t - 1)
-            if t < k
-            else aux(eq, k - t)
-        )
-
-    return aux(xs, k)
+    mid = len(xs) // 2
+    pivot = head_k(xs, mid)
+    lt = filter(xs, lambda x: x < pivot)
+    eq = filter(xs, lambda x: x == pivot)
+    gt = filter(xs, lambda x: x > pivot)
+    return (
+        selecionar(lt, k)
+        if k < len(lt)
+        else pivot
+        if k < len(lt) + len(eq)
+        else
+        selecionar(gt, k - len(lt) - len(gt))
+    )
 
 
 # Questao 13
@@ -316,8 +305,8 @@ def convoluir(a, b):
     def aux(a, b, k):
         if k == -1:
             return []
-        i = range(m - 1)
-        j = range(n - 1)
+        i = [x for x in range(m)]
+        j = [x for x in range(n)]
         p = cartesian_product(i, j)
         p = filter(p, lambda x: reduce(x, sum, 0) == k)
         p = map(p, lambda x: head_k(a, head(x)) * head_k(b, last(x)))
@@ -597,8 +586,11 @@ def subconjuntos_soma(xs, target):
     return ps
 
 
-# 23 Permutações únicas em ordem lexicográfica
+# 26 Todas as soluções de n rainhas
 
-
-def permutacoes(xs):
-    pass
+def rainhas(n):
+    def abs(x): return x if x >= 0 else -x
+    def safe(c, qs, d=1): return qs == [] or (c != head(qs) and abs(c-head(qs)) != d and safe(c, tail(qs), d+1))
+    def go(k):
+        return [[]] if k == 0 else [[c] + qs for qs in go(k-1) for c in range(n) if safe(c,qs)]
+    return go(n)
