@@ -377,7 +377,12 @@ def perfects(n):
 #   rotate(-1, [1, 2, 3, 4]) -> [4, 1, 2, 3]
 #   rotate(10, []) -> []
 def rotate(k, xs):
-    pass
+    return (
+        xs if not xs or k == 0
+        else rotate(k % len(xs), xs) if k >= len(xs)
+        else rotate(k-1, my_append([head(tail(xs))], my_append(tail(tail(xs)),[head(xs)]))) if k > 0
+        else rotate(k+1, my_append([last(xs)], my_append(init(init(xs)), [last(init(xs))])))
+    )
 
 # 29 [MÉDIO] windows
 # Retorna todas as sublistas contíguas de tamanho k (k > 0), avançando uma
@@ -388,7 +393,7 @@ def rotate(k, xs):
 #   windows(1, [8, 5]) -> [[8], [5]]
 #   windows(3, [1, 2]) -> []
 def windows(k, xs):
-    pass
+    return [] if not xs or k > len(xs) else my_append([my_take(k, xs)], windows(k, tail(xs)))
 
 # 30 [MÉDIO] histogram
 # Produz uma lista de pares (valor, frequência total). Cada valor aparece uma
@@ -398,7 +403,7 @@ def windows(k, xs):
 #   histogram([3, 1, 3, 2, 1, 3]) -> [(3, 3), (1, 2), (2, 1)]
 #   histogram([]) -> []
 def histogram(xs):
-    pass
+    return my_map(lambda x: (x, count_if(lambda y: y == x, xs)), remove_duplicates(xs))
 
 # ============================================================================
 # PARTE 3 - DIFÍCEIS (31 a 60)
@@ -413,7 +418,22 @@ def histogram(xs):
 #   merge_sort_by(lambda a, b: a >= b, [1, 3, 2]) -> [3, 2, 1]
 #   merge_sort_by(lambda a, b: a <= b, []) -> []
 def merge_sort_by(le, xs):
-    pass
+    def merge(le, xs, ys):
+        return (
+            xs if not ys
+            else ys if not xs
+            else my_append([head(xs)], merge(le, tail(xs), ys)) if le(head(xs), head(ys))
+            else my_append([head(ys)], merge(le, xs, tail(ys)))
+        )
+    if not xs or not tail(xs):
+        return xs
+    mid = my_length(xs) // 2
+    l = my_take(mid, xs)
+    r = my_drop(mid, xs)
+    return merge(le, merge_sort_by(le, l), merge_sort_by(le, r))
+
+def get(k, xs):
+    return head(my_drop(k, xs))
 
 # 32 [DIFÍCIL] quick_select
 # Retorna o elemento que ocuparia o índice k (a partir de zero) se a lista
@@ -425,7 +445,18 @@ def merge_sort_by(le, xs):
 #   quick_select(1, [7, 2, 5, 2, 9]) -> 2
 #   quick_select(-1, [4, 1]) -> None
 def quick_select(k, xs):
-    pass
+    if k < 0 or k >= len(xs):
+        return None
+    mid = my_length(xs) // 2
+    pivot = get(mid, xs)
+    lt = my_filter(lambda x: x < pivot, xs)
+    eq = my_filter(lambda x: x == pivot, xs)
+    gt = my_filter(lambda x: x > pivot, xs)
+    return (
+        quick_select(k, lt) if k < len(lt)
+        else pivot if k < len(lt) + len(eq)
+        else quick_select(k - len(lt) - len(eq), gt)
+    )
 
 # 33 [DIFÍCIL] convolve
 # Cada lista representa os coeficientes de um polinômio, do termo constante
@@ -437,7 +468,23 @@ def quick_select(k, xs):
 #   convolve([0, 1], [0, 1]) -> [0, 0, 1]
 #   convolve([], [1, 2]) -> []
 def convolve(a, b):
-    pass
+    def mul(p):
+        (i, j) = p
+        return get(i, a) * get(j, b)
+    if not a or not b:
+        return []
+    m = my_length(a)
+    n = my_length(b)
+    ps = [(i, j) for i in range(m) for j in range(n)]
+    xs = [[mul(p) for p in ps if my_foldr(add, 0, p) == x] for x in range(m+n-1)]
+    return my_map(lambda x: my_foldr(add, 0, x), xs)
+
+def transpose(m):
+    return (
+        m if not m
+        else [] if not head(m)
+        else my_append([my_map(head, m)], transpose(my_map(tail, m)))
+    )
 
 # 34 [DIFÍCIL] rotate_matrix
 # Gira a matriz em 90 graus no sentido horário. Uma matriz com m linhas e n
@@ -449,7 +496,7 @@ def convolve(a, b):
 #   rotate_matrix([[1], [2], [3]]) -> [[3, 2, 1]]
 #   rotate_matrix([]) -> []
 def rotate_matrix(m):
-    pass
+    return my_map(my_reverse, transpose(m))
 
 # 35 [DIFÍCIL] mat_mul
 # Produto matricial: cada elemento da saída é o produto escalar de uma linha
@@ -459,7 +506,15 @@ def rotate_matrix(m):
 #   mat_mul([[1, 2, 3], [4, 5, 6]], [[1, 0], [0, 1], [1, 1]]) -> [[4, 5], [10, 11]]
 #   mat_mul([[0, 2]], [[3], [4]]) -> [[8]]
 def mat_mul(a, b):
-    pass
+    return transpose(
+        my_map(
+            lambda y: my_map(
+                lambda x: my_foldr(add, 0, my_zip_with(lambda i,j: i * j, x, y)),
+                a
+            ),
+            transpose(b)
+        )
+    )
 
 # 36 [DIFÍCIL] spiral
 # Lê a matriz em espiral no sentido horário, começando no canto superior
@@ -470,7 +525,10 @@ def mat_mul(a, b):
 #   spiral([[1], [2], [3]]) -> [1, 2, 3]
 #   spiral([]) -> []
 def spiral(m):
-    pass
+    return (
+        m if not m
+        else my_append(head(m), spiral(my_reverse(transpose(tail(m)))))
+    )
 
 # 37 [DIFÍCIL] balanced
 # Verifica se os delimitadores (), [] e {} estão corretamente pareados e
@@ -481,7 +539,26 @@ def spiral(m):
 #   balanced('([)]') -> False
 #   balanced('') -> True
 def balanced(text):
-    pass
+    def aux(text, s):
+        if not text and not s:
+            return True
+        if not text:
+            return False
+        c = head(text)
+        if c == "(":
+            return aux(tail(text), [")"] + s)
+        if c == "[":
+            return aux(tail(text), ["]"] + s)
+        if c == "{":
+            return aux(tail(text), ["}"] + s)
+        if not my_elem(c, [")", "]", "}"]):
+            return aux(tail(text), s)
+        if not s:
+            return False
+        if c == head(s):
+            return aux(tail(text), tail(s))
+        return aux(tail(text), s)
+    return aux(text, [])
 
 # 38 [DIFÍCIL] eval_rpn
 # Avalia uma expressão em notação pós-fixa usando uma pilha imutável. Cada
@@ -495,7 +572,38 @@ def balanced(text):
 #   eval_rpn([5, '+']) -> None
 #   eval_rpn([5, 0, '//']) -> None
 def eval_rpn(tokens):
-    pass
+    def is_operand(token):
+        return token == "+" or token == "-" or token == "*" or token == "//"
+    def eval(op, operands):
+        if my_length(operands) < 2:
+            return None
+        (l, r) = (head(operands), head(tail(operands)))
+        return (
+            None if op == "//" and r == 0
+            else l + r if op == "+"
+            else l - r if op == "-"
+            else l * r if op == "*"
+            else l // r
+        )
+    def aux(tokens, xs):
+        if not tokens and not xs:
+            return None
+        if not tokens and not tail(xs):
+            return head(xs)
+        if not tokens and tail(xs):
+            return None
+        t = head(tokens)
+        return (
+            aux(tail(tokens), xs + [t]) if not is_operand(t)
+            else aux(tail(tokens), [eval(t, xs)] + tail(tail(xs)))
+        )
+    return aux(tokens, [])
+
+def drop_while(p, xs):
+    return xs if not xs or not p(head(xs)) else drop_while(p, tail(xs))
+
+def take_while(p, xs):
+    return [] if not xs or not p(head(xs)) else [head(xs)] + take_while(p, tail(xs))
 
 # 39 [DIFÍCIL] wildcard_match
 # Verifica se o padrão corresponde ao texto inteiro. O símbolo ? representa
@@ -506,7 +614,25 @@ def eval_rpn(tokens):
 #   wildcard_match('a?b', 'ab') -> False
 #   wildcard_match('*', '') -> True
 def wildcard_match(pattern, text):
-    pass
+    if pattern == "*":
+        return True
+    if pattern == "?":
+        return text and not tail(text)
+    if not text or not pattern:
+        return not text and not pattern
+    p = head(pattern)
+    if p == "*":
+        pp = head(tail(pattern))
+        if pp == "*" or pp == "?":
+            return wildcard_match(tail(pattern), text)
+        return wildcard_match(tail(pattern), drop_while(lambda t: t != pp, text))
+    if p == "?":
+        return wildcard_match(tail(pattern), tail(text))
+    return p == head(text) and wildcard_match(tail(pattern), tail(text))
+
+
+def min(xs):
+    return head(xs) if not tail(xs) or head(xs) < min(tail(xs)) else min(tail(xs))
 
 # 40 [DIFÍCIL] edit_distance
 # Calcula o menor número de operações para transformar a string a na string b.
@@ -517,7 +643,17 @@ def wildcard_match(pattern, text):
 #   edit_distance('', 'abc') -> 3
 #   edit_distance('casa', 'casa') -> 0
 def edit_distance(a, b):
-    pass
+    if not a:
+        return my_length(b)
+    if not b:
+        return my_length(a)
+    if head(a) == head(b):
+        return edit_distance(tail(a), tail(b))
+    return 1 + min([
+        edit_distance(tail(a), b),
+        edit_distance(tail(a), tail(b)),
+        edit_distance(a, tail(b))
+    ])
 
 # 41 [DIFÍCIL] lcs
 # Retorna uma subsequência comum de comprimento máximo das duas strings
