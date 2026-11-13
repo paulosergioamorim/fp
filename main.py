@@ -172,6 +172,10 @@ def my_foldl(f, z, xs):
 def my_zip_with(f, xs, ys):
     return [] if not xs or not ys else [f(head(xs), head(ys))] + my_zip_with(f, tail(xs), tail(ys))
 
+
+def my_drop(n, xs):
+    return [] if not xs else xs if n == 0 else my_drop(n-1, tail(xs))
+
 # 14 [MÉDIO] my_span
 # Retorna o par (prefixo, resto), em que prefixo é o maior prefixo da lista
 # cujos elementos satisfazem p, e resto é o restante da lista.
@@ -179,7 +183,9 @@ def my_zip_with(f, xs, ys):
 #   my_span(lambda x: x < 3, [1, 2, 3, 1]) -> ([1, 2], [3, 1])
 #   my_span(lambda x: x > 5, [1, 9]) -> ([], [1, 9])
 def my_span(p, xs):
-    pass
+    def aux(p, xs):
+        return 0 if not xs or not p(head(xs)) else 1 + aux(p, tail(xs))
+    return (my_take(aux(p, xs), xs), my_drop(aux(p,xs),xs))
 
 # 15 [MÉDIO] partition
 # Retorna o par (aceitos, rejeitados): aceitos contém os elementos que
@@ -189,7 +195,7 @@ def my_span(p, xs):
 #   partition(lambda x: x % 2 == 0, [-3, 4, 0, 5, 2]) -> ([4, 0, 2], [-3, 5])
 #   partition(lambda x: x > 0, []) -> ([], [])
 def partition(p, xs):
-    pass
+    return (my_filter(p, xs), my_filter(lambda x: not p(x), xs))
 
 # 16 [MÉDIO] compose_all
 # Aplica ao valor x todas as funções da lista, da esquerda para a direita: a
@@ -199,7 +205,7 @@ def partition(p, xs):
 #   compose_all([lambda x: x + 2, lambda x: x * x, lambda x: x - 1], 3) -> 24
 #   compose_all([], 9) -> 9
 def compose_all(fs, x):
-    pass
+    return x if not fs else compose_all(tail(fs), head(fs)(x))
 
 # 17 [MÉDIO] remove_duplicates
 # Remove os elementos repetidos, mantendo apenas a primeira ocorrência de cada
@@ -208,7 +214,7 @@ def compose_all(fs, x):
 #   remove_duplicates([3, 1, 3, 2, 1]) -> [3, 1, 2]
 #   remove_duplicates([]) -> []
 def remove_duplicates(xs):
-    pass
+    return my_foldl(lambda acc, x: acc if my_elem(x, acc) else my_append(acc, [x]), [], xs)
 
 # 18 [MÉDIO] insertion_sort_by
 # Ordena a lista por inserção. A função le(a, b) devolve True quando a pode
@@ -219,7 +225,10 @@ def remove_duplicates(xs):
 #   insertion_sort_by(lambda a, b: a >= b, [3, 1, 2]) -> [3, 2, 1]
 #   insertion_sort_by(lambda a, b: head(a) <= head(b), [(2, 'a'), (1, 'b'), (2, 'c')]) -> [(1, 'b'), (2, 'a'), (2, 'c')]
 def insertion_sort_by(le, xs):
-    pass
+    if not xs:
+        return xs
+    (fst, snd) = my_span(lambda x: le(x, last(xs)), insertion_sort_by(le, init(xs)))
+    return my_append(my_append(fst, [last(xs)]), snd)
 
 # 19 [MÉDIO] compress
 # Elimina duplicatas consecutivas de uma lista, mantendo um representante de
@@ -228,7 +237,10 @@ def insertion_sort_by(le, xs):
 #   compress([1, 1, 2, 1, 1, 3]) -> [1, 2, 1, 3]
 #   compress([]) -> []
 def compress(xs):
-    pass
+    if not xs:
+        return xs
+    (fst, snd) = my_span(lambda x: x == head(xs), xs)
+    return my_append([head(xs)], compress(snd))
 
 # 20 [MÉDIO] pack
 # Empacota os elementos duplicados consecutivos em sublistas.
@@ -236,7 +248,10 @@ def compress(xs):
 #   pack([1, 1, 2, 3, 3, 3, 1]) -> [[1, 1], [2], [3, 3, 3], [1]]
 #   pack([]) -> []
 def pack(xs):
-    pass
+    if not xs:
+        return xs
+    (fst, snd) = my_span(lambda x: x == head(xs), xs)
+    return my_append([fst], pack(snd))
 
 # 21 [MÉDIO] encode
 # Compressão por tamanho de sequência: cada bloco de elementos duplicados
@@ -246,7 +261,10 @@ def pack(xs):
 #   encode('aaaabccaadeeee') -> [(4, 'a'), (1, 'b'), (2, 'c'), (2, 'a'), (1, 'd'), (4, 'e')]
 #   encode([]) -> []
 def encode(xs):
-    pass
+    if not xs:
+        return []
+    (fst, snd) = my_span(lambda x: x == head(xs), xs)
+    return my_append([(my_length(fst), head(fst))], encode(snd))
 
 # 22 [MÉDIO] decode
 # Inversa de encode: dada uma lista de pares (n, e), reconstrói a lista
@@ -255,7 +273,10 @@ def encode(xs):
 #   decode([(2, 7), (1, 5), (3, 7)]) -> [7, 7, 5, 7, 7, 7]
 #   decode([]) -> []
 def decode(ps):
-    pass
+    if not ps:
+        return ps
+    (n, e) = head(ps)
+    return my_append([e for _ in range(n)], decode(tail(ps)))
 
 # 23 [MÉDIO] split_token
 # Divide a lista em sublistas usando o valor t como marcador. O marcador não
@@ -266,7 +287,10 @@ def decode(ps):
 #   split_token(0, [0, 1, 0, 0, 2]) -> [[], [1], [], [2]]
 #   split_token(0, []) -> [[]]
 def split_token(t, xs):
-    pass
+    if not xs:
+        return xs
+    (fst, snd) = my_span(lambda x: x != t, xs)
+    return my_append([fst], split_token(t, tail(snd)))
 
 # 24 [MÉDIO] join_token
 # Inversa de split_token/splitToken: concatena as sublistas usando o valor t
@@ -276,7 +300,27 @@ def split_token(t, xs):
 #   join_token(0, [[], [1]]) -> [0, 1]
 #   join_token(0, []) -> []
 def join_token(t, xss):
-    pass
+    return (
+        xss if not xss
+        else my_append(my_append(head(xss), [] if not tail(xss) else [t]), join_token(t, tail(xss)))
+    )
+
+def is_prime(n):
+    def aux(n, p):
+        return n % p != 0 and (p * p > n or aux(n, p+1))
+    return n != 1 and (n == 2 or aux(n, 2))
+
+def next_prime(n):
+    return n+1 if is_prime(n+1) else next_prime(n+1)
+
+def factors(n):
+    def aux(n, p):
+        return [] if p > n else my_append([p], aux(n // p, p)) if n % p == 0 else aux(n, next_prime(p))
+    return aux(n, 2)
+
+def swap(t):
+    (fst, snd) = t
+    return (snd, fst)
 
 # 25 [MÉDIO] prime_factors
 # Fatora um inteiro n >= 1 em uma lista de pares (fator, frequência), com os
@@ -286,7 +330,7 @@ def join_token(t, xss):
 #   prime_factors(42) -> [(2, 1), (3, 1), (7, 1)]
 #   prime_factors(1) -> []
 def prime_factors(n):
-    pass
+    return my_map(swap, encode(factors(n)))
 
 # 26 [MÉDIO] pyths
 # Uma tripla (x, y, z) de inteiros positivos é pitagórica se x*x + y*y == z*z.
@@ -296,7 +340,19 @@ def prime_factors(n):
 #   pyths(5) -> [(3, 4, 5), (4, 3, 5)]
 #   pyths(10) -> [(3, 4, 5), (4, 3, 5), (6, 8, 10), (8, 6, 10)]
 def pyths(n):
-    pass
+    def p(t):
+        (x, y, z) = t
+        return x * x + y * y == z * z
+    r = range(1, n+1)
+    ts = [(x,y,z) for x in r for y in r for z in r]
+    # Using builtin filter to avoid recursion limit with pyths(10)
+    return list(filter(p, ts))
+
+def divisors(n):
+    return [p for p in range(1, n) if n % p == 0]
+
+def add(x,y):
+    return x+y
 
 # 27 [MÉDIO] perfects
 # Um inteiro positivo é perfeito se é igual à soma de seus divisores,
@@ -306,7 +362,11 @@ def pyths(n):
 #   perfects(500) -> [6, 28, 496]
 #   perfects(5) -> []
 def perfects(n):
-    pass
+    xs = [x for x in range(1, n+1)]
+    def p(t):
+        (x, ps) = t
+        return my_foldr(add, 0, ps) == x
+    return my_map(head, my_filter(p, my_map(lambda x: (x, divisors(x)), xs)))
 
 # 28 [MÉDIO] rotate
 # Retorna a lista após k rotações de uma posição para a esquerda. Se k for
