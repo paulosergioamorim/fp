@@ -574,10 +574,7 @@ def balanced(text):
 def eval_rpn(tokens):
     def is_operand(token):
         return token == "+" or token == "-" or token == "*" or token == "//"
-    def eval(op, operands):
-        if my_length(operands) < 2:
-            return None
-        (l, r) = (head(operands), head(tail(operands)))
+    def eval(op, l, r):
         return (
             None if op == "//" and r == 0
             else l + r if op == "+"
@@ -585,19 +582,18 @@ def eval_rpn(tokens):
             else l * r if op == "*"
             else l // r
         )
-    def aux(tokens, xs):
-        if not tokens and not xs:
-            return None
-        if not tokens and not tail(xs):
-            return head(xs)
-        if not tokens and tail(xs):
-            return None
-        t = head(tokens)
-        return (
-            aux(tail(tokens), xs + [t]) if not is_operand(t)
-            else aux(tail(tokens), [eval(t, xs)] + tail(tail(xs)))
-        )
-    return aux(tokens, [])
+    xs, ys = my_span(lambda x: not is_operand(x), tokens)
+    if not ys:
+        return None if not xs or tail(xs) else head(xs)
+    if my_length(xs) < 2:
+        return None
+    op, rest = head(ys), tail(ys)
+    l, r = last(init(xs)), last(xs)
+    x = eval(op, l, r)
+    return (
+        x if x is None
+        else eval_rpn(my_append(init(init(xs)) + [x], rest))
+    )
 
 def drop_while(p, xs):
     return xs if not xs or not p(head(xs)) else drop_while(p, tail(xs))
