@@ -660,7 +660,19 @@ def edit_distance(a, b):
 #   lcs('ba', 'ab') -> 'a'
 #   lcs('', 'abc') -> ''
 def lcs(a, b):
-    pass
+    def best(a, b):
+        return (
+            a if my_length(a) > my_length(b)
+            else b if my_length(b) > my_length(a)
+            else a if a < b
+            else b
+        )
+    return (
+        "" if not a or not b
+        else head(a) + lcs(tail(a), tail(b))
+        if head(a) == head(b)
+        else best(lcs(tail(a), b), lcs(a, tail(b)))
+    )
 
 # 42 [DIFÍCIL] subset_sum
 # Retorna todos os subconjuntos da lista cuja soma é target. Cada elemento
@@ -803,6 +815,9 @@ def level_order(t):
 #   bst_from_list([]) -> []
 def bst_from_list(xs):
     pass
+
+def to_set(xs):
+    return my_foldl(lambda acc, x: acc if my_elem(x, acc) else acc + [x], [], xs)
 
 # 54 [DIFÍCIL] power_set
 # Retorna todos os subconjuntos da lista, preservando a ordem original dentro
