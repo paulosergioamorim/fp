@@ -41,9 +41,11 @@ def init(xs):
 def last(xs):
     return xs[-1]
 
+
 # ============================================================================
 # PARTE 1 - FÁCEIS (01 a 10)
 # ============================================================================
+
 
 # 01 [FÁCIL] my_length
 # Retorna a quantidade de elementos de uma lista.
@@ -53,6 +55,7 @@ def last(xs):
 def my_length(xs):
     return 0 if not xs else 1 + my_length(tail(xs))
 
+
 # 02 [FÁCIL] my_elem
 # Verifica se o elemento x pertence à lista.
 # Exemplos:
@@ -60,6 +63,7 @@ def my_length(xs):
 #   my_elem('z', 'abc') -> False
 def my_elem(x, xs):
     return False if not xs else x == head(xs) or my_elem(x, tail(xs))
+
 
 # 03 [FÁCIL] my_append
 # Concatena duas listas, com o mesmo comportamento do operador de
@@ -71,6 +75,7 @@ def my_elem(x, xs):
 def my_append(xs, ys):
     return xs if not ys else my_append(xs + [head(ys)], tail(ys))
 
+
 # 04 [FÁCIL] my_reverse
 # Inverte o conteúdo de uma lista.
 # Exemplos:
@@ -78,6 +83,7 @@ def my_append(xs, ys):
 #   my_reverse('abcd') -> 'dcba'
 def my_reverse(xs):
     return xs if not xs else [last(xs)] + my_reverse(init(xs))
+
 
 # 05 [FÁCIL] my_map
 # Aplica a função f a cada elemento da lista, preservando a ordem.
@@ -87,6 +93,7 @@ def my_reverse(xs):
 def my_map(f, xs):
     return xs if not xs else [f(head(xs))] + my_map(f, tail(xs))
 
+
 # 06 [FÁCIL] my_filter
 # Retorna apenas os elementos da lista que satisfazem o predicado p,
 # preservando a ordem.
@@ -94,7 +101,14 @@ def my_map(f, xs):
 #   my_filter(lambda x: x % 2 == 0, [1, 2, 3, 4]) -> [2, 4]
 #   my_filter(lambda x: x > 9, [1, 2]) -> []
 def my_filter(p, xs):
-    return xs if not xs else [head(xs)] + my_filter(p, tail(xs)) if p(head(xs)) else my_filter(p, tail(xs))
+    return (
+        xs
+        if not xs
+        else [head(xs)] + my_filter(p, tail(xs))
+        if p(head(xs))
+        else my_filter(p, tail(xs))
+    )
+
 
 # 07 [FÁCIL] count_if
 # Conta quantos elementos da lista satisfazem o predicado p.
@@ -104,6 +118,7 @@ def my_filter(p, xs):
 def count_if(p, xs):
     return 0 if not xs else (1 if p(head(xs)) else 0) + count_if(p, tail(xs))
 
+
 # 08 [FÁCIL] my_maximum
 # Retorna o maior elemento de uma lista não vazia.
 # Exemplos:
@@ -111,9 +126,11 @@ def count_if(p, xs):
 #   my_maximum([-5]) -> -5
 def my_maximum(xs):
     return (
-        head(xs) if my_length(xs) == 1
+        head(xs)
+        if my_length(xs) == 1
         else (head(xs) if head(xs) > my_maximum(tail(xs)) else my_maximum(tail(xs)))
     )
+
 
 # 09 [FÁCIL] my_take
 # Retorna os n primeiros elementos da lista. Se a lista tiver menos de n
@@ -123,7 +140,8 @@ def my_maximum(xs):
 #   my_take(5, [1, 2]) -> [1, 2]
 #   my_take(0, [1, 2]) -> []
 def my_take(n, xs):
-    return [] if not xs or n == 0 else [head(xs)] + my_take(n-1, tail(xs))
+    return [] if not xs or n == 0 else [head(xs)] + my_take(n - 1, tail(xs))
+
 
 # 10 [FÁCIL] is_palindrome
 # Verifica se uma sequência é palíndroma, isto é, igual à sua inversa. A
@@ -134,14 +152,16 @@ def my_take(n, xs):
 #   is_palindrome('') -> True
 def is_palindrome(xs):
     return (
-        not xs or
-        my_length(xs) == 1 or
-        (head(xs) == last(xs) and is_palindrome(init(tail(xs))))
+        not xs
+        or my_length(xs) == 1
+        or (head(xs) == last(xs) and is_palindrome(init(tail(xs))))
     )
+
 
 # ============================================================================
 # PARTE 2 - MÉDIAS (11 a 30)
 # ============================================================================
+
 
 # 11 [MÉDIO] my_foldr
 # Redução à direita: combina os elementos da direita para a esquerda, partindo
@@ -153,6 +173,7 @@ def is_palindrome(xs):
 def my_foldr(f, z, xs):
     return z if not xs else f(head(xs), my_foldr(f, z, tail(xs)))
 
+
 # 12 [MÉDIO] my_foldl
 # Redução à esquerda: combina os elementos da esquerda para a direita,
 # partindo do valor inicial z. Para [x1, x2, x3] o resultado é f(f(f(z, x1),
@@ -163,6 +184,7 @@ def my_foldr(f, z, xs):
 def my_foldl(f, z, xs):
     return z if not xs else f(my_foldl(f, z, init(xs)), last(xs))
 
+
 # 13 [MÉDIO] my_zip_with
 # Combina as duas listas elemento a elemento usando f. O resultado tem o
 # tamanho da menor lista.
@@ -170,11 +192,16 @@ def my_foldl(f, z, xs):
 #   my_zip_with(lambda x, y: x + y, [1, 2, 3], [10, 20]) -> [11, 22]
 #   my_zip_with(lambda x, y: (x, y), [1, 2], 'ab') -> [(1, 'a'), (2, 'b')]
 def my_zip_with(f, xs, ys):
-    return [] if not xs or not ys else [f(head(xs), head(ys))] + my_zip_with(f, tail(xs), tail(ys))
+    return (
+        []
+        if not xs or not ys
+        else [f(head(xs), head(ys))] + my_zip_with(f, tail(xs), tail(ys))
+    )
 
 
 def my_drop(n, xs):
-    return [] if not xs else xs if n == 0 else my_drop(n-1, tail(xs))
+    return [] if not xs else xs if n == 0 else my_drop(n - 1, tail(xs))
+
 
 # 14 [MÉDIO] my_span
 # Retorna o par (prefixo, resto), em que prefixo é o maior prefixo da lista
@@ -185,7 +212,9 @@ def my_drop(n, xs):
 def my_span(p, xs):
     def aux(p, xs):
         return 0 if not xs or not p(head(xs)) else 1 + aux(p, tail(xs))
-    return (my_take(aux(p, xs), xs), my_drop(aux(p,xs),xs))
+
+    return (my_take(aux(p, xs), xs), my_drop(aux(p, xs), xs))
+
 
 # 15 [MÉDIO] partition
 # Retorna o par (aceitos, rejeitados): aceitos contém os elementos que
@@ -197,6 +226,7 @@ def my_span(p, xs):
 def partition(p, xs):
     return (my_filter(p, xs), my_filter(lambda x: not p(x), xs))
 
+
 # 16 [MÉDIO] compose_all
 # Aplica ao valor x todas as funções da lista, da esquerda para a direita: a
 # primeira recebe x, a segunda recebe o resultado da primeira, e assim por
@@ -207,6 +237,7 @@ def partition(p, xs):
 def compose_all(fs, x):
     return x if not fs else compose_all(tail(fs), head(fs)(x))
 
+
 # 17 [MÉDIO] remove_duplicates
 # Remove os elementos repetidos, mantendo apenas a primeira ocorrência de cada
 # valor, na ordem original.
@@ -214,7 +245,10 @@ def compose_all(fs, x):
 #   remove_duplicates([3, 1, 3, 2, 1]) -> [3, 1, 2]
 #   remove_duplicates([]) -> []
 def remove_duplicates(xs):
-    return my_foldl(lambda acc, x: acc if my_elem(x, acc) else my_append(acc, [x]), [], xs)
+    return my_foldl(
+        lambda acc, x: acc if my_elem(x, acc) else my_append(acc, [x]), [], xs
+    )
+
 
 # 18 [MÉDIO] insertion_sort_by
 # Ordena a lista por inserção. A função le(a, b) devolve True quando a pode
@@ -230,6 +264,7 @@ def insertion_sort_by(le, xs):
     (fst, snd) = my_span(lambda x: le(x, last(xs)), insertion_sort_by(le, init(xs)))
     return my_append(my_append(fst, [last(xs)]), snd)
 
+
 # 19 [MÉDIO] compress
 # Elimina duplicatas consecutivas de uma lista, mantendo um representante de
 # cada bloco.
@@ -239,8 +274,9 @@ def insertion_sort_by(le, xs):
 def compress(xs):
     if not xs:
         return xs
-    (fst, snd) = my_span(lambda x: x == head(xs), xs)
+    (_, snd) = my_span(lambda x: x == head(xs), xs)
     return my_append([head(xs)], compress(snd))
+
 
 # 20 [MÉDIO] pack
 # Empacota os elementos duplicados consecutivos em sublistas.
@@ -252,6 +288,7 @@ def pack(xs):
         return xs
     (fst, snd) = my_span(lambda x: x == head(xs), xs)
     return my_append([fst], pack(snd))
+
 
 # 21 [MÉDIO] encode
 # Compressão por tamanho de sequência: cada bloco de elementos duplicados
@@ -266,6 +303,7 @@ def encode(xs):
     (fst, snd) = my_span(lambda x: x == head(xs), xs)
     return my_append([(my_length(fst), head(fst))], encode(snd))
 
+
 # 22 [MÉDIO] decode
 # Inversa de encode: dada uma lista de pares (n, e), reconstrói a lista
 # original. As quantidades são inteiros positivos.
@@ -277,6 +315,7 @@ def decode(ps):
         return ps
     (n, e) = head(ps)
     return my_append([e for _ in range(n)], decode(tail(ps)))
+
 
 # 23 [MÉDIO] split_token
 # Divide a lista em sublistas usando o valor t como marcador. O marcador não
@@ -292,6 +331,7 @@ def split_token(t, xs):
     (fst, snd) = my_span(lambda x: x != t, xs)
     return my_append([fst], split_token(t, tail(snd)))
 
+
 # 24 [MÉDIO] join_token
 # Inversa de split_token/splitToken: concatena as sublistas usando o valor t
 # como separador entre elas.
@@ -301,26 +341,42 @@ def split_token(t, xs):
 #   join_token(0, []) -> []
 def join_token(t, xss):
     return (
-        xss if not xss
-        else my_append(my_append(head(xss), [] if not tail(xss) else [t]), join_token(t, tail(xss)))
+        xss
+        if not xss
+        else my_append(
+            my_append(head(xss), [] if not tail(xss) else [t]), join_token(t, tail(xss))
+        )
     )
+
 
 def is_prime(n):
     def aux(n, p):
-        return n % p != 0 and (p * p > n or aux(n, p+1))
+        return n % p != 0 and (p * p > n or aux(n, p + 1))
+
     return n != 1 and (n == 2 or aux(n, 2))
 
+
 def next_prime(n):
-    return n+1 if is_prime(n+1) else next_prime(n+1)
+    return n + 1 if is_prime(n + 1) else next_prime(n + 1)
+
 
 def factors(n):
     def aux(n, p):
-        return [] if p > n else my_append([p], aux(n // p, p)) if n % p == 0 else aux(n, next_prime(p))
+        return (
+            []
+            if p > n
+            else my_append([p], aux(n // p, p))
+            if n % p == 0
+            else aux(n, next_prime(p))
+        )
+
     return aux(n, 2)
+
 
 def swap(t):
     (fst, snd) = t
     return (snd, fst)
+
 
 # 25 [MÉDIO] prime_factors
 # Fatora um inteiro n >= 1 em uma lista de pares (fator, frequência), com os
@@ -331,6 +387,7 @@ def swap(t):
 #   prime_factors(1) -> []
 def prime_factors(n):
     return my_map(swap, encode(factors(n)))
+
 
 # 26 [MÉDIO] pyths
 # Uma tripla (x, y, z) de inteiros positivos é pitagórica se x*x + y*y == z*z.
@@ -343,16 +400,20 @@ def pyths(n):
     def p(t):
         (x, y, z) = t
         return x * x + y * y == z * z
-    r = range(1, n+1)
-    ts = [(x,y,z) for x in r for y in r for z in r]
+
+    r = range(1, n + 1)
+    ts = [(x, y, z) for x in r for y in r for z in r]
     # Using builtin filter to avoid recursion limit with pyths(10)
     return list(filter(p, ts))
+
 
 def divisors(n):
     return [p for p in range(1, n) if n % p == 0]
 
-def add(x,y):
-    return x+y
+
+def add(x, y):
+    return x + y
+
 
 # 27 [MÉDIO] perfects
 # Um inteiro positivo é perfeito se é igual à soma de seus divisores,
@@ -362,11 +423,14 @@ def add(x,y):
 #   perfects(500) -> [6, 28, 496]
 #   perfects(5) -> []
 def perfects(n):
-    xs = [x for x in range(1, n+1)]
+    xs = [x for x in range(1, n + 1)]
+
     def p(t):
         (x, ps) = t
         return my_foldr(add, 0, ps) == x
+
     return my_map(head, my_filter(p, my_map(lambda x: (x, divisors(x)), xs)))
+
 
 # 28 [MÉDIO] rotate
 # Retorna a lista após k rotações de uma posição para a esquerda. Se k for
@@ -378,11 +442,19 @@ def perfects(n):
 #   rotate(10, []) -> []
 def rotate(k, xs):
     return (
-        xs if not xs or k == 0
-        else rotate(k % len(xs), xs) if k >= len(xs)
-        else rotate(k-1, my_append([head(tail(xs))], my_append(tail(tail(xs)),[head(xs)]))) if k > 0
-        else rotate(k+1, my_append([last(xs)], my_append(init(init(xs)), [last(init(xs))])))
+        xs
+        if not xs or k == 0
+        else rotate(k % len(xs), xs)
+        if k >= len(xs)
+        else rotate(
+            k - 1, my_append([head(tail(xs))], my_append(tail(tail(xs)), [head(xs)]))
+        )
+        if k > 0
+        else rotate(
+            k + 1, my_append([last(xs)], my_append(init(init(xs)), [last(init(xs))]))
+        )
     )
+
 
 # 29 [MÉDIO] windows
 # Retorna todas as sublistas contíguas de tamanho k (k > 0), avançando uma
@@ -393,7 +465,12 @@ def rotate(k, xs):
 #   windows(1, [8, 5]) -> [[8], [5]]
 #   windows(3, [1, 2]) -> []
 def windows(k, xs):
-    return [] if not xs or k > len(xs) else my_append([my_take(k, xs)], windows(k, tail(xs)))
+    return (
+        []
+        if not xs or k > len(xs)
+        else my_append([my_take(k, xs)], windows(k, tail(xs)))
+    )
+
 
 # 30 [MÉDIO] histogram
 # Produz uma lista de pares (valor, frequência total). Cada valor aparece uma
@@ -405,9 +482,11 @@ def windows(k, xs):
 def histogram(xs):
     return my_map(lambda x: (x, count_if(lambda y: y == x, xs)), remove_duplicates(xs))
 
+
 # ============================================================================
 # PARTE 3 - DIFÍCEIS (31 a 60)
 # ============================================================================
+
 
 # 31 [DIFÍCIL] merge_sort_by
 # Ordena a lista com merge sort: divisão ao meio, ordenação recursiva das
@@ -420,11 +499,15 @@ def histogram(xs):
 def merge_sort_by(le, xs):
     def merge(le, xs, ys):
         return (
-            xs if not ys
-            else ys if not xs
-            else my_append([head(xs)], merge(le, tail(xs), ys)) if le(head(xs), head(ys))
+            xs
+            if not ys
+            else ys
+            if not xs
+            else my_append([head(xs)], merge(le, tail(xs), ys))
+            if le(head(xs), head(ys))
             else my_append([head(ys)], merge(le, xs, tail(ys)))
         )
+
     if not xs or not tail(xs):
         return xs
     mid = my_length(xs) // 2
@@ -432,8 +515,10 @@ def merge_sort_by(le, xs):
     r = my_drop(mid, xs)
     return merge(le, merge_sort_by(le, l), merge_sort_by(le, r))
 
+
 def get(k, xs):
     return head(my_drop(k, xs))
+
 
 # 32 [DIFÍCIL] quick_select
 # Retorna o elemento que ocuparia o índice k (a partir de zero) se a lista
@@ -453,10 +538,13 @@ def quick_select(k, xs):
     eq = my_filter(lambda x: x == pivot, xs)
     gt = my_filter(lambda x: x > pivot, xs)
     return (
-        quick_select(k, lt) if k < len(lt)
-        else pivot if k < len(lt) + len(eq)
+        quick_select(k, lt)
+        if k < len(lt)
+        else pivot
+        if k < len(lt) + len(eq)
         else quick_select(k - len(lt) - len(eq), gt)
     )
+
 
 # 33 [DIFÍCIL] convolve
 # Cada lista representa os coeficientes de um polinômio, do termo constante
@@ -471,20 +559,25 @@ def convolve(a, b):
     def mul(p):
         (i, j) = p
         return get(i, a) * get(j, b)
+
     if not a or not b:
         return []
     m = my_length(a)
     n = my_length(b)
     ps = [(i, j) for i in range(m) for j in range(n)]
-    xs = [[mul(p) for p in ps if my_foldr(add, 0, p) == x] for x in range(m+n-1)]
+    xs = [[mul(p) for p in ps if my_foldr(add, 0, p) == x] for x in range(m + n - 1)]
     return my_map(lambda x: my_foldr(add, 0, x), xs)
+
 
 def transpose(m):
     return (
-        m if not m
-        else [] if not head(m)
+        m
+        if not m
+        else []
+        if not head(m)
         else my_append([my_map(head, m)], transpose(my_map(tail, m)))
     )
+
 
 # 34 [DIFÍCIL] rotate_matrix
 # Gira a matriz em 90 graus no sentido horário. Uma matriz com m linhas e n
@@ -498,6 +591,7 @@ def transpose(m):
 def rotate_matrix(m):
     return my_map(my_reverse, transpose(m))
 
+
 # 35 [DIFÍCIL] mat_mul
 # Produto matricial: cada elemento da saída é o produto escalar de uma linha
 # de a por uma coluna de b. As matrizes são retangulares, não vazias e de
@@ -509,12 +603,12 @@ def mat_mul(a, b):
     return transpose(
         my_map(
             lambda y: my_map(
-                lambda x: my_foldr(add, 0, my_zip_with(lambda i,j: i * j, x, y)),
-                a
+                lambda x: my_foldr(add, 0, my_zip_with(lambda i, j: i * j, x, y)), a
             ),
-            transpose(b)
+            transpose(b),
         )
     )
+
 
 # 36 [DIFÍCIL] spiral
 # Lê a matriz em espiral no sentido horário, começando no canto superior
@@ -525,10 +619,8 @@ def mat_mul(a, b):
 #   spiral([[1], [2], [3]]) -> [1, 2, 3]
 #   spiral([]) -> []
 def spiral(m):
-    return (
-        m if not m
-        else my_append(head(m), spiral(my_reverse(transpose(tail(m)))))
-    )
+    return m if not m else my_append(head(m), spiral(my_reverse(transpose(tail(m)))))
+
 
 # 37 [DIFÍCIL] balanced
 # Verifica se os delimitadores (), [] e {} estão corretamente pareados e
@@ -558,7 +650,9 @@ def balanced(text):
         if c == head(s):
             return aux(tail(text), tail(s))
         return aux(tail(text), s)
+
     return aux(text, [])
+
 
 # 38 [DIFÍCIL] eval_rpn
 # Avalia uma expressão em notação pós-fixa usando uma pilha imutável. Cada
@@ -574,14 +668,20 @@ def balanced(text):
 def eval_rpn(tokens):
     def is_operand(token):
         return token == "+" or token == "-" or token == "*" or token == "//"
+
     def eval(op, l, r):
         return (
-            None if op == "//" and r == 0
-            else l + r if op == "+"
-            else l - r if op == "-"
-            else l * r if op == "*"
+            None
+            if op == "//" and r == 0
+            else l + r
+            if op == "+"
+            else l - r
+            if op == "-"
+            else l * r
+            if op == "*"
             else l // r
         )
+
     xs, ys = my_span(lambda x: not is_operand(x), tokens)
     if not ys:
         return None if not xs or tail(xs) else head(xs)
@@ -590,16 +690,16 @@ def eval_rpn(tokens):
     op, rest = head(ys), tail(ys)
     l, r = last(init(xs)), last(xs)
     x = eval(op, l, r)
-    return (
-        x if x is None
-        else eval_rpn(my_append(init(init(xs)) + [x], rest))
-    )
+    return x if x is None else eval_rpn(my_append(init(init(xs)) + [x], rest))
+
 
 def drop_while(p, xs):
     return xs if not xs or not p(head(xs)) else drop_while(p, tail(xs))
 
+
 def take_while(p, xs):
     return [] if not xs or not p(head(xs)) else [head(xs)] + take_while(p, tail(xs))
+
 
 # 39 [DIFÍCIL] wildcard_match
 # Verifica se o padrão corresponde ao texto inteiro. O símbolo ? representa
@@ -630,6 +730,7 @@ def wildcard_match(pattern, text):
 def min(xs):
     return head(xs) if not tail(xs) or head(xs) < min(tail(xs)) else min(tail(xs))
 
+
 # 40 [DIFÍCIL] edit_distance
 # Calcula o menor número de operações para transformar a string a na string b.
 # As operações são inserir, remover ou substituir um caractere, todas com
@@ -645,11 +746,14 @@ def edit_distance(a, b):
         return my_length(a)
     if head(a) == head(b):
         return edit_distance(tail(a), tail(b))
-    return 1 + min([
-        edit_distance(tail(a), b),
-        edit_distance(tail(a), tail(b)),
-        edit_distance(a, tail(b))
-    ])
+    return 1 + min(
+        [
+            edit_distance(tail(a), b),
+            edit_distance(tail(a), tail(b)),
+            edit_distance(a, tail(b)),
+        ]
+    )
+
 
 # 41 [DIFÍCIL] lcs
 # Retorna uma subsequência comum de comprimento máximo das duas strings
@@ -662,17 +766,21 @@ def edit_distance(a, b):
 def lcs(a, b):
     def best(a, b):
         return (
-            a if my_length(a) > my_length(b)
-            else b if my_length(b) > my_length(a)
-            else a if a < b
+            a
+            if my_length(a) > my_length(b)
             else b
+            if my_length(b) > my_length(a)
+            else min([a, b])
         )
+
     return (
-        "" if not a or not b
+        ""
+        if not a or not b
         else head(a) + lcs(tail(a), tail(b))
         if head(a) == head(b)
         else best(lcs(tail(a), b), lcs(a, tail(b)))
     )
+
 
 # 42 [DIFÍCIL] subset_sum
 # Retorna todos os subconjuntos da lista cuja soma é target. Cada elemento
@@ -686,6 +794,7 @@ def lcs(a, b):
 def subset_sum(target, xs):
     return my_filter(lambda s: my_foldr(add, 0, s) == target, power_set(xs))
 
+
 # 43 [DIFÍCIL] unique_permutations
 # Retorna todas as permutações distintas da lista em ordem lexicográfica
 # crescente. Valores repetidos não podem gerar respostas duplicadas. A única
@@ -696,7 +805,8 @@ def subset_sum(target, xs):
 #   unique_permutations([]) -> [[]]
 def unique_permutations(xs):
     def le(x, y):
-        x <= y
+        return x <= y
+
     def aux(xs):
         if not xs:
             return [[]]
@@ -707,7 +817,9 @@ def unique_permutations(xs):
             for p in pos
             for perm in unique_permutations(tail(xs))
         ]
+
     return merge_sort_by(le, to_set(aux(xs)))
+
 
 # 44 [DIFÍCIL] min_change
 # Compõe value com a menor quantidade possível de moedas, com uso ilimitado de
@@ -722,6 +834,7 @@ def unique_permutations(xs):
 def min_change(coins, value):
     pass
 
+
 # 45 [DIFÍCIL] knapsack
 # Mochila 0/1: cada item é um par (peso, valor). Retorne o maior valor total
 # que pode ser transportado sem exceder a capacidade. Cada item pode ser usado
@@ -732,6 +845,7 @@ def min_change(coins, value):
 #   knapsack(3, []) -> 0
 def knapsack(capacity, items):
     pass
+
 
 # 46 [DIFÍCIL] queens
 # Posiciona n rainhas em um tabuleiro n por n sem ataques entre elas. Cada
@@ -744,10 +858,19 @@ def knapsack(capacity, items):
 #   queens(0) -> [[]]
 def queens(n):
     def safe(c, qs, d=1):
-        return not qs or (c != head(qs) and abs(c-head(qs)) != d and safe(c, tail(qs), d+1))
+        return not qs or (
+            c != head(qs) and abs(c - head(qs)) != d and safe(c, tail(qs), d + 1)
+        )
+
     def go(k):
-        return [[]] if k == 0 else [[c] + qs for qs in go(k-1) for c in range(n) if safe(c, qs)]
+        return (
+            [[]]
+            if k == 0
+            else [[c] + qs for qs in go(k - 1) for c in range(n) if safe(c, qs)]
+        )
+
     return go(n)
+
 
 # 47 [DIFÍCIL] count_paths
 # Conta os caminhos do canto superior esquerdo ao canto inferior direito de
@@ -761,6 +884,7 @@ def queens(n):
 def count_paths(grid):
     pass
 
+
 # 48 [DIFÍCIL] simple_paths
 # O grafo dirigido é uma lista de pares (vértice, vizinhos). Retorne todos os
 # caminhos de src a dst sem repetir vértice no mesmo caminho, explorando os
@@ -773,14 +897,17 @@ def count_paths(grid):
 def simple_paths(graph, src, dst):
     pass
 
+
 def count_nodes_tree(t):
     if not t:
         return 0
     l, r = head(tail(t)), last(t)
     return 1 + count_nodes_tree(l) + count_nodes_tree(r)
 
+
 def max(xs):
     return head(xs) if not tail(xs) or head(xs) > max(tail(xs)) else max(tail(xs))
+
 
 def height_tree(t):
     if not t:
@@ -790,6 +917,7 @@ def height_tree(t):
     rh = height_tree(r)
     return 1 + max([lh, rh])
 
+
 def is_bst(t):
     def max_t(t):
         if not t:
@@ -798,6 +926,7 @@ def is_bst(t):
         if not r:
             return head(t)
         return max_t(r)
+
     def min_t(t):
         if not t:
             return None
@@ -805,10 +934,14 @@ def is_bst(t):
         if not l:
             return head(t)
         return min_t(l)
+
     if not t:
         return True
     v, l, r = head(t), head(tail(t)), last(t)
-    return is_bst(l) and is_bst(r) and (not l or max_t(l) < v) and (not r or v < min_t(r))
+    return (
+        is_bst(l) and is_bst(r) and (not l or max_t(l) < v) and (not r or v < min_t(r))
+    )
+
 
 def is_balanced(t):
     if not t:
@@ -832,6 +965,7 @@ def is_balanced(t):
 def analyze_tree(t):
     return (count_nodes_tree(t), height_tree(t), is_bst(t), is_balanced(t))
 
+
 # 50 [DIFÍCIL] derive
 # Derivação simbólica. Constantes são ['c', n], variáveis ['v', nome], somas
 # ['+', a, b] e produtos ['*', a, b]. Retorne a árvore da derivada em relação
@@ -846,6 +980,7 @@ def analyze_tree(t):
 def derive(var, expr):
     pass
 
+
 # 51 [DIFÍCIL] fold_tree
 # Redução sobre árvore binária: a árvore vazia vale z; em cada nó, f recebe o
 # valor do nó, o resultado da subárvore esquerda e o resultado da subárvore
@@ -858,7 +993,8 @@ def fold_tree(f, z, t):
     if not t:
         return z
     v, l, r = head(t), head(tail(t)), last(t)
-    return f(v, fold_tree(f,z,l), fold_tree(f,z,r))
+    return f(v, fold_tree(f, z, l), fold_tree(f, z, r))
+
 
 # 52 [DIFÍCIL] level_order
 # Percurso em largura: retorna uma lista com os valores de cada nível da
@@ -868,6 +1004,7 @@ def fold_tree(f, z, t):
 #   level_order([]) -> []
 def level_order(t):
     pass
+
 
 # 53 [DIFÍCIL] bst_from_list
 # Constrói uma árvore binária de busca inserindo os elementos da lista, da
@@ -881,8 +1018,10 @@ def level_order(t):
 def bst_from_list(xs):
     pass
 
+
 def to_set(xs):
     return my_foldl(lambda acc, x: acc if my_elem(x, acc) else acc + [x], [], xs)
+
 
 # 54 [DIFÍCIL] power_set
 # Retorna todos os subconjuntos da lista, preservando a ordem original dentro
@@ -893,8 +1032,11 @@ def to_set(xs):
 #   power_set([]) -> [[]]
 def power_set(xs):
     return (
-        [[]] if not xs
-        else my_append(my_map(lambda s: [head(xs)] + s, power_set(tail(xs))), power_set(tail(xs)))
+        [[]]
+        if not xs
+        else my_append(
+            my_map(lambda s: [head(xs)] + s, power_set(tail(xs))), power_set(tail(xs))
+        )
     )
 
 
@@ -909,6 +1051,7 @@ def power_set(xs):
 def combinations(k, xs):
     return my_filter(lambda s: my_length(s) == k, power_set(xs))
 
+
 # 56 [DIFÍCIL] hanoi
 # Torre de Hanói: retorna a sequência mínima de movimentos (origem, destino)
 # para levar n discos do pino 'A' ao pino 'C', usando 'B' como auxiliar, sem
@@ -920,6 +1063,7 @@ def combinations(k, xs):
 def hanoi(n):
     pass
 
+
 # 57 [DIFÍCIL] longest_increasing
 # Retorna uma subsequência estritamente crescente de comprimento máximo
 # (preserva a ordem, mas pode pular posições). Havendo várias respostas
@@ -930,6 +1074,7 @@ def hanoi(n):
 #   longest_increasing([]) -> []
 def longest_increasing(xs):
     pass
+
 
 # 58 [DIFÍCIL] merge_intervals
 # Recebe intervalos fechados (início, fim), com início <= fim, em qualquer
@@ -943,6 +1088,7 @@ def longest_increasing(xs):
 def merge_intervals(xs):
     pass
 
+
 # 59 [DIFÍCIL] shortest_path
 # O grafo dirigido é uma lista de pares (vértice, vizinhos). Retorne um
 # caminho de src a dst com o menor número de arestas, usando busca em largura
@@ -955,6 +1101,7 @@ def merge_intervals(xs):
 #   shortest_path([(1, [2]), (2, [])], 1, 1) -> [1]
 def shortest_path(graph, src, dst):
     pass
+
 
 # 60 [DIFÍCIL] generate_parens
 # Gera todas as strings com n pares de parênteses corretamente balanceados, em
