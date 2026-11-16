@@ -811,7 +811,7 @@ def unique_permutations(xs):
         if not xs:
             return [[]]
         x = head(xs)
-        pos = list(range(my_length(xs)))
+        pos = range(my_length(xs))
         return [
             my_append(my_take(p, perm), my_append([x], my_drop(p, perm)))
             for p in pos
