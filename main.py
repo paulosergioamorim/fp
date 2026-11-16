@@ -684,7 +684,7 @@ def lcs(a, b):
 #   subset_sum(3, [2, 4]) -> []
 #   subset_sum(0, []) -> [[]]
 def subset_sum(target, xs):
-    pass
+    return my_filter(lambda s: my_foldr(add, 0, s) == target, power_set(xs))
 
 # 43 [DIFÍCIL] unique_permutations
 # Retorna todas as permutações distintas da lista em ordem lexicográfica
@@ -695,7 +695,19 @@ def subset_sum(target, xs):
 #   unique_permutations([3, 3]) -> [[3, 3]]
 #   unique_permutations([]) -> [[]]
 def unique_permutations(xs):
-    pass
+    def le(x, y):
+        x <= y
+    def aux(xs):
+        if not xs:
+            return [[]]
+        x = head(xs)
+        pos = list(range(my_length(xs)))
+        return [
+            my_append(my_take(p, perm), my_append([x], my_drop(p, perm)))
+            for p in pos
+            for perm in unique_permutations(tail(xs))
+        ]
+    return merge_sort_by(le, to_set(aux(xs)))
 
 # 44 [DIFÍCIL] min_change
 # Compõe value com a menor quantidade possível de moedas, com uso ilimitado de
@@ -731,7 +743,11 @@ def knapsack(capacity, items):
 #   queens(2) -> []
 #   queens(0) -> [[]]
 def queens(n):
-    pass
+    def safe(c, qs, d=1):
+        return not qs or (c != head(qs) and abs(c-head(qs)) != d and safe(c, tail(qs), d+1))
+    def go(k):
+        return [[]] if k == 0 else [[c] + qs for qs in go(k-1) for c in range(n) if safe(c, qs)]
+    return go(n)
 
 # 47 [DIFÍCIL] count_paths
 # Conta os caminhos do canto superior esquerdo ao canto inferior direito de
@@ -757,6 +773,52 @@ def count_paths(grid):
 def simple_paths(graph, src, dst):
     pass
 
+def count_nodes_tree(t):
+    if not t:
+        return 0
+    l, r = head(tail(t)), last(t)
+    return 1 + count_nodes_tree(l) + count_nodes_tree(r)
+
+def max(xs):
+    return head(xs) if not tail(xs) or head(xs) > max(tail(xs)) else max(tail(xs))
+
+def height_tree(t):
+    if not t:
+        return 0
+    l, r = head(tail(t)), last(t)
+    lh = height_tree(l)
+    rh = height_tree(r)
+    return 1 + max([lh, rh])
+
+def is_bst(t):
+    def max_t(t):
+        if not t:
+            return None
+        r = last(t)
+        if not r:
+            return head(t)
+        return max_t(r)
+    def min_t(t):
+        if not t:
+            return None
+        l = head(tail(t))
+        if not l:
+            return head(t)
+        return min_t(l)
+    if not t:
+        return True
+    v, l, r = head(t), head(tail(t)), last(t)
+    return is_bst(l) and is_bst(r) and (not l or max_t(l) < v) and (not r or v < min_t(r))
+
+def is_balanced(t):
+    if not t:
+        return True
+    l, r = head(tail(t)), last(t)
+    lh = height_tree(l)
+    rh = height_tree(r)
+    return is_balanced(l) and is_balanced(r) and abs(lh - rh) <= 1
+
+
 # 49 [DIFÍCIL] analyze_tree
 # Retorna a tupla (quantidade de nós, altura, é de busca, é balanceada). É de
 # busca se, em todos os níveis, todo valor à esquerda é menor que o nó e todo
@@ -768,7 +830,7 @@ def simple_paths(graph, src, dst):
 #   analyze_tree([3, [2, [1, [], []], []], []]) -> (3, 3, True, False)
 #   analyze_tree([]) -> (0, 0, True, True)
 def analyze_tree(t):
-    pass
+    return (count_nodes_tree(t), height_tree(t), is_bst(t), is_balanced(t))
 
 # 50 [DIFÍCIL] derive
 # Derivação simbólica. Constantes são ['c', n], variáveis ['v', nome], somas
@@ -793,7 +855,10 @@ def derive(var, expr):
 #   fold_tree(lambda v, l, r: l + [v] + r, [], [2, [1, [], []], [3, [], []]]) -> [1, 2, 3]
 #   fold_tree(lambda v, l, r: 1 + (l if l > r else r), 0, []) -> 0
 def fold_tree(f, z, t):
-    pass
+    if not t:
+        return z
+    v, l, r = head(t), head(tail(t)), last(t)
+    return f(v, fold_tree(f,z,l), fold_tree(f,z,r))
 
 # 52 [DIFÍCIL] level_order
 # Percurso em largura: retorna uma lista com os valores de cada nível da
@@ -827,7 +892,11 @@ def to_set(xs):
 #   power_set([1, 2, 3]) -> [[1, 2, 3], [1, 2], [1, 3], [1], [2, 3], [2], [3], []]
 #   power_set([]) -> [[]]
 def power_set(xs):
-    pass
+    return (
+        [[]] if not xs
+        else my_append(my_map(lambda s: [head(xs)] + s, power_set(tail(xs))), power_set(tail(xs)))
+    )
+
 
 # 55 [DIFÍCIL] combinations
 # Retorna todas as formas de escolher k elementos da lista, preservando a
@@ -838,7 +907,7 @@ def power_set(xs):
 #   combinations(0, [1, 2]) -> [[]]
 #   combinations(3, [1, 2]) -> []
 def combinations(k, xs):
-    pass
+    return my_filter(lambda s: my_length(s) == k, power_set(xs))
 
 # 56 [DIFÍCIL] hanoi
 # Torre de Hanói: retorna a sequência mínima de movimentos (origem, destino)
