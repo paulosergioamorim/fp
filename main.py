@@ -210,10 +210,7 @@ def my_drop(n, xs):
 #   my_span(lambda x: x < 3, [1, 2, 3, 1]) -> ([1, 2], [3, 1])
 #   my_span(lambda x: x > 5, [1, 9]) -> ([], [1, 9])
 def my_span(p, xs):
-    def aux(p, xs):
-        return 0 if not xs or not p(head(xs)) else 1 + aux(p, tail(xs))
-
-    return (my_take(aux(p, xs), xs), my_drop(aux(p, xs), xs))
+    return (take_while(p, xs), drop_while(p, xs))
 
 
 # 15 [MÉDIO] partition
