@@ -1058,7 +1058,20 @@ def combinations(k, xs):
 #   hanoi(1) -> [('A', 'C')]
 #   hanoi(0) -> []
 def hanoi(n):
-    pass
+    def aux(src, dst):
+        return (
+            "A"
+            if (src == "B" and dst == "C") or (src == "C" and dst == "B")
+            else "B"
+            if (src == "A" and dst == "C") or (src == "C" and dst == "A")
+            else "C"
+        )
+    def go(n, src, dst):
+        return (
+            [] if not n
+            else go(n-1, src, aux(src, dst)) + [(src, dst)] + go(n-1, aux(src, dst), dst)
+        )
+    return go(n, 'A', 'C')
 
 
 # 57 [DIFÍCIL] longest_increasing
