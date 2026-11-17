@@ -88,8 +88,8 @@ myMap f (x:xs) = myAppend [f x] (myMap f xs)
 myFilter :: (a -> Bool) -> [a] -> [a]
 myFilter _ [] = []
 myFilter f (x:xs)
-	| f x == True = myAppend [x] (myFilter f xs)
-	| otherwise = myFilter f xs
+    | f x == True = myAppend [x] (myFilter f xs)
+    | otherwise = myFilter f xs
 
 -- 07 [FÁCIL] countIf
 -- Conta quantos elementos da lista satisfazem o predicado p.
@@ -575,7 +575,11 @@ myZipWith f (x:xs) (y:ys) = (f x y) : myZipWith f xs ys
 -- Exemplos:
 --   powerSet [1, 2, 3] -> [[1, 2, 3], [1, 2], [1, 3], [1], [2, 3], [2], [3], []]
 --   powerSet [] -> [[]]
--- powerSet :: [a] -> [[a]]
+powerSet :: [a] -> [[a]]
+powerSet [] = [[]]
+powerSet (x:xs) =
+    let ps = powerSet xs in
+        map (x :) ps ++ ps
 
 -- 55 [DIFÍCIL] combinations
 -- Retorna todas as formas de escolher k elementos da lista, preservando a
@@ -585,7 +589,8 @@ myZipWith f (x:xs) (y:ys) = (f x y) : myZipWith f xs ys
 --   combinations 2 [1, 2, 3] -> [[1, 2], [1, 3], [2, 3]]
 --   combinations 0 [1, 2] -> [[]]
 --   combinations 3 [1, 2] -> []
--- combinations :: Int -> [a] -> [[a]]
+combinations :: Int -> [a] -> [[a]]
+combinations k xs = filter ((==) k . length) $ powerSet xs
 
 -- 56 [DIFÍCIL] hanoi
 -- Torre de Hanói: retorna a sequência mínima de movimentos (origem, destino)
