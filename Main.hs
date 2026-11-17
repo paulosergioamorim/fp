@@ -37,14 +37,18 @@ data Token = Val Int | Op String deriving (Show, Eq)
 -- Exemplos:
 --   myLength [4, 5, 6] -> 3
 --   myLength [] -> 0
--- myLength :: [a] -> Int
+myLength :: [a] -> Int
+myLength [] = 0
+myLength (x:xs) = 1 + myLength xs
 
 -- 02 [FÁCIL] myElem
 -- Verifica se o elemento x pertence à lista.
 -- Exemplos:
 --   myElem 3 [1, 2, 3] -> True
 --   myElem 'z' "abc" -> False
--- myElem :: Eq a => a -> [a] -> Bool
+myElem :: Eq a => a -> [a] -> Bool
+myElem target [] = False
+myElem target (x:xs) = target == x || myElem target xs
 
 -- 03 [FÁCIL] myAppend
 -- Concatena duas listas, com o mesmo comportamento do operador de
@@ -53,21 +57,27 @@ data Token = Val Int | Op String deriving (Show, Eq)
 -- Exemplos:
 --   myAppend [1, 2] [3, 4] -> [1, 2, 3, 4]
 --   myAppend [] [7] -> [7]
--- myAppend :: [a] -> [a] -> [a]
+myAppend :: [a] -> [a] -> [a]
+myAppend xs [] = xs
+myAppend xs (y:ys) = myAppend (xs ++ [y]) ys
 
 -- 04 [FÁCIL] myReverse
 -- Inverte o conteúdo de uma lista.
 -- Exemplos:
 --   myReverse [1, 2, 3] -> [3, 2, 1]
 --   myReverse "abcd" -> "dcba"
--- myReverse :: [a] -> [a]
+myReverse :: [a] -> [a]
+myReverse [] = []
+myReverse (x:xs) = myAppend (myReverse xs) [x]
 
 -- 05 [FÁCIL] myMap
 -- Aplica a função f a cada elemento da lista, preservando a ordem.
 -- Exemplos:
 --   myMap (\x -> x * x) [1, 2, 3] -> [1, 4, 9]
 --   myMap (\x -> x + 1) [] -> []
--- myMap :: (a -> b) -> [a] -> [b]
+myMap :: (a -> b) -> [a] -> [b]
+myMap _ [] = []
+myMap f (x:xs) = myAppend [f x] (myMap f xs)
 
 -- 06 [FÁCIL] myFilter
 -- Retorna apenas os elementos da lista que satisfazem o predicado p,
@@ -75,21 +85,28 @@ data Token = Val Int | Op String deriving (Show, Eq)
 -- Exemplos:
 --   myFilter (\x -> x `mod` 2 == 0) [1, 2, 3, 4] -> [2, 4]
 --   myFilter (\x -> x > 9) [1, 2] -> []
--- myFilter :: (a -> Bool) -> [a] -> [a]
+myFilter :: (a -> Bool) -> [a] -> [a]
+myFilter _ [] = []
+myFilter f (x:xs)
+	| f x == True = myAppend [x] (myFilter f xs)
+	| otherwise = myFilter f xs
 
 -- 07 [FÁCIL] countIf
 -- Conta quantos elementos da lista satisfazem o predicado p.
 -- Exemplos:
 --   countIf (\x -> x < 0) [3, -1, 0, -7] -> 2
 --   countIf (\x -> x > 2) [] -> 0
--- countIf :: (a -> Bool) -> [a] -> Int
+countIf :: (a -> Bool) -> [a] -> Int
+countIf f xs = myLength (myFilter f xs)
 
 -- 08 [FÁCIL] myMaximum
 -- Retorna o maior elemento de uma lista não vazia.
 -- Exemplos:
 --   myMaximum [3, 9, 2] -> 9
 --   myMaximum [-5] -> -5
--- myMaximum :: Ord a => [a] -> a
+myMaximum :: Ord a => [a] -> a
+myMaximum (x:[]) = x
+myMaximum (x:xs) = if x > myMaximum xs then x else myMaximum xs
 
 -- 09 [FÁCIL] myTake
 -- Retorna os n primeiros elementos da lista. Se a lista tiver menos de n
@@ -98,7 +115,10 @@ data Token = Val Int | Op String deriving (Show, Eq)
 --   myTake 2 [7, 8, 9] -> [7, 8]
 --   myTake 5 [1, 2] -> [1, 2]
 --   myTake 0 [1, 2] -> []
--- myTake :: Int -> [a] -> [a]
+myTake :: Int -> [a] -> [a]
+myTake _ [] = []
+myTake 0 _ = []
+myTake k (x:xs) = x : myTake (k - 1) xs
 
 -- 10 [FÁCIL] isPalindrome
 -- Verifica se uma sequência é palíndroma, isto é, igual à sua inversa. A
@@ -107,7 +127,10 @@ data Token = Val Int | Op String deriving (Show, Eq)
 --   isPalindrome "arara" -> True
 --   isPalindrome [1, 2, 3] -> False
 --   isPalindrome "" -> True
--- isPalindrome :: Eq a => [a] -> Bool
+isPalindrome :: Eq a => [a] -> Bool
+isPalindrome [] = True
+isPalindrome (x:[]) = True
+isPalindrome xs = head xs == last xs && isPalindrome (init $ tail xs)
 
 -- ============================================================================
 -- PARTE 2 - MÉDIAS (11 a 30)
@@ -120,7 +143,9 @@ data Token = Val Int | Op String deriving (Show, Eq)
 --   myFoldr (\x acc -> x - acc) 0 [1, 2, 3] -> 2
 --   myFoldr (\x acc -> acc ++ [x]) [] [1, 2, 3] -> [3, 2, 1]
 --   myFoldr (\x acc -> x + acc) 7 [] -> 7
--- myFoldr :: (a -> b -> b) -> b -> [a] -> b
+myFoldr :: (a -> b -> b) -> b -> [a] -> b
+myFoldr _ z [] = z
+myFoldr f z (x:xs) = f x (myFoldr f z xs)
 
 -- 12 [MÉDIO] myFoldl
 -- Redução à esquerda: combina os elementos da esquerda para a direita,
@@ -129,7 +154,9 @@ data Token = Val Int | Op String deriving (Show, Eq)
 -- Exemplos:
 --   myFoldl (\acc x -> acc - x) 0 [1, 2, 3] -> -6
 --   myFoldl (\acc x -> acc * 10 + x) 0 [1, 2, 3] -> 123
--- myFoldl :: (b -> a -> b) -> b -> [a] -> b
+myFoldl :: (b -> a -> b) -> b -> [a] -> b
+myFoldl _ z [] = z
+myFoldl f z xs = f (myFoldl f z (init xs)) (last xs)
 
 -- 13 [MÉDIO] myZipWith
 -- Combina as duas listas elemento a elemento usando f. O resultado tem o
@@ -137,7 +164,10 @@ data Token = Val Int | Op String deriving (Show, Eq)
 -- Exemplos:
 --   myZipWith (\x y -> x + y) [1, 2, 3] [10, 20] -> [11, 22]
 --   myZipWith (\x y -> (x, y)) [1, 2] "ab" -> [(1, 'a'), (2, 'b')]
--- myZipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+myZipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+myZipWith _ [] _ = []
+myZipWith _ _ [] = []
+myZipWith f (x:xs) (y:ys) = (f x y) : myZipWith f xs ys
 
 -- 14 [MÉDIO] mySpan
 -- Retorna o par (prefixo, resto), em que prefixo é o maior prefixo da lista
