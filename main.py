@@ -1106,4 +1106,22 @@ def shortest_path(graph, src, dst):
 #   generate_parens(1) -> ['()']
 #   generate_parens(0) -> ['']
 def generate_parens(n):
-    pass
+    return (
+        ""
+        if not n
+        else ["()"]
+        if n == 1
+        else merge_sort_by(
+            lambda x, y: x < y,
+            remove_duplicates(
+                foldr(
+                    append,
+                    [],
+                    map(
+                        lambda x: ["(" + x + ")", "()" + x, x + "()"],
+                        generate_parens(n - 1),
+                    ),
+                )
+            ),
+        )
+    )
