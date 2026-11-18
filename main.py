@@ -799,7 +799,7 @@ def unique_permutations(xs):
             for perm in unique_permutations(tail(xs))
         ]
 
-    return merge_sort_by(le, to_set(aux(xs)))
+    return merge_sort_by(le, remove_duplicates(aux(xs)))
 
 
 # 44 [DIFÍCIL] min_change
@@ -998,10 +998,6 @@ def level_order(t):
 #   bst_from_list([]) -> []
 def bst_from_list(xs):
     pass
-
-
-def to_set(xs):
-    return foldl(lambda acc, x: acc if elem(x, acc) else acc + [x], [], xs)
 
 
 # 54 [DIFÍCIL] power_set
