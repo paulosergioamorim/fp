@@ -825,7 +825,20 @@ def min_change(coins, value):
 #   knapsack(4, [(2, 6)]) -> 6
 #   knapsack(3, []) -> 0
 def knapsack(capacity, items):
-    pass
+    def sum_value(i, acc):
+        _, v = i
+        return v + acc
+
+    def sum_weight(i, acc):
+        p, _ = i
+        return p + acc
+
+    return max(
+        map(
+            lambda p: foldr(sum_value, 0, p),
+            filter(lambda p: foldr(sum_weight, 0, p) <= capacity, power_set(items)),
+        )
+    )
 
 
 # 46 [DIFÍCIL] queens
